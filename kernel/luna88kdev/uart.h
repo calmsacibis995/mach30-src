@@ -1,0 +1,195 @@
+/*
+ * Mach Operating System
+ * Copyright (c) 1993-1991 Carnegie Mellon University
+ * Copyright (c) 1991 OMRON Corporation
+ * All Rights Reserved.
+ *
+ * Permission to use, copy, modify and distribute this software and its
+ * documentation is hereby granted, provided that both the copyright
+ * notice and this permission notice appear in all copies of the
+ * software, derivative works or modified versions, and any portions
+ * thereof, and that both notices appear in supporting documentation.
+ *
+ * CARNEGIE MELLON AND OMRON ALLOW FREE USE OF THIS SOFTWARE IN ITS "AS IS"
+ * CONDITION.  CARNEGIE MELLON AND OMRON DISCLAIM ANY LIABILITY OF ANY KIND
+ * FOR ANY DAMAGES WHATSOEVER RESULTING FROM THE USE OF THIS SOFTWARE.
+ *
+ * Carnegie Mellon requests users of this software to return to
+ *
+ *  Software Distribution Coordinator  or  Software.Distribution@CS.CMU.EDU
+ *  School of Computer Science
+ *  Carnegie Mellon University
+ *  Pittsburgh PA 15213-3890
+ *
+ * any improvements or extensions that they make and grant Carnegie the
+ * rights to redistribute these changes.
+ *
+ * HISTORY
+ * $Log:	uart.h,v $
+ * Revision 2.3  93/03/09  18:00:36  danner
+ * 	Redid.
+ * 	[93/03/09            jfriedl]
+ * 
+ */
+
+/*
+ * Hardware interface to the uart driver.
+ */
+extern struct uart_device {
+    volatile unsigned int
+                data: 8,
+             /*pad*/:24,
+                cmd : 8,
+             /*pad*/:24;
+} *uart_addr[];
+#define status  cmd          /* both written and read from */
+
+
+/* logical to physical line number (not sure why we just don't
+    change the logical line numbers???) */
+#define ldevtop(dev)    ((dev)==2?0:1)
+#define keyboard_control(BYTE) uart_addr[ldevtop(KBD)]->data = (BYTE)
+
+/*
+ * This is a description of the keyboard hardware interface.
+ * Data from the keyboard comes one byte at a time via the uart driver
+ * (see other uart code)
+ *
+ * If the byte is of the binary form 10000xxx, the byte is the first of three
+ * which form one mouse data packet. The first byte is interpreted as the
+ * binary 10000LMR, where the bits LMR are 1 if the left, middle, and/or
+ * right button respectively is/are down at the moment.
+ *
+ * The next two bytes are taken as unsigned bytes representing relative
+ * X and Y movement since the last mouse data triplit.
+ *
+ * There are always three bytes in a row, even if there is no change in
+ * the button status, or if there is no mouse movement. Any one single
+ * change will generate the triplit.
+ *
+ *
+ * If a byte from the keyboard is not a mouse byte (i.e. if it is not of
+ * the form 10000xxx and isn't the 1st or 2nd byte after one), it is a
+ * key press or key release code.
+ *
+ * Each time a key is pressed or released, a byte is generated.  The lower
+ * seven bits are the keyboard hardware code for the key (see KEYCODE_
+ * defines below). If the high bit is zero, the data represents a press
+ * of the key. If one, a release of the key.
+ *
+ *
+ * Thre is a location for writing bytes to the keyboard.
+ *
+ * For turning the CAPS and KANA lights on and off, the data byte should
+ * be in the binary form 000IxxxJ where I=0 means "off", I=1 means "on",
+ * and where J=0 indicates the KANA keycap, J=1 indicates the CAP keycap.
+ *
+ * For ringing the buzzer, the data is in the form 010DDFFF where DD and FFF
+ * represent the duration and frequency of the beep as represented by the
+ * defines below.
+ *
+ * For turning the mouse on and off, the code 0M1xxxxx is used, where
+ * M=1 means "mouse on", M=0 means "mouse off".
+ */
+#define MOUSE_ENABLE_CODE	0x60	/* turns mouse on */
+#define MOUSE_DISABLE_CODE	0x20	/* turns mouse off */
+
+#define KANA_LIGHT_ON_CODE	0x10	/* turns kana keycap light on */
+#define KANA_LIGHT_OFF_CODE	0x00	/* turns kana keycap light off */
+#define CAPS_LIGHT_ON_CODE	0x11	/* turns caps keycap light on */
+#define CAPS_LIGHT_OFF_CODE	0x01	/* turns caps keycap light off */
+
+#define BUZZER_LENGTH__40msec	0x00	/* .04 seconds */
+#define BUZZER_LENGTH_150msec   0x08	/* .15 seconds */
+#define BUZZER_LENGTH_400msec   0x10	/* .4  seconds */
+#define BUZZER_LENGTH_700msec   0x18	/* .7  seconds */
+#define BUZZER_TONE_6000Hz	0x0	/* 6k Hz  */
+#define BUZZER_TONE_3000Hz	0x1	/* 3k Hz  */
+#define BUZZER_TONE_1500Hz	0x2	/* 1.5kHz */
+#define BUZZER_TONE_1000Hz	0x3	/* 1k Hz  */
+#define BUZZER_TONE__600Hz	0x4	/* 600 Hz */
+#define BUZZER_TONE__300Hz	0x5	/* 300 Hz */
+#define BUZZER_TONE__150Hz	0x6	/* 150 Hz */
+#define BUZZER_TONE__100Hz	0x7	/* 100 Hz */
+#define BUZZER_CODE(duration, frequency) (0x40|(duration)|(frequency))
+#define BUZZ(duration, frequency) \
+	keyboard_control(BUZZER_CODE(duration,frequency))
+
+/*
+ * keycodes are 8 bits, 7 bits of code plus the high bit:
+ * 	high bit clear: code is key down
+ * 	high bit set  : code is key up
+ */
+#define IS_DOWN_KEY_CODE(code)	(!((code)&0x80))
+#define IS_UP_KEY_CODE(code)	  ((code)&0x80)
+
+#define DOWN_KEY_CODE(code)	((code)&0x7F)
+#define UP_KEY_CODE(code)	((code)|0x80)
+
+/*
+ * raw codes generated by the keyboard.
+ */
+#define KEYCODE_TAB		0x09
+#define KEYCODE_CTRL		0x0A
+#define KEYCODE_KANA		0x0B /* japanese keyboard only */
+#define KEYCODE_RIGHT_SHIFT	0x0C
+#define KEYCODE_LEFT_SHIFT	0x0D
+#define KEYCODE_CAPS		0x0E
+#define KEYCODE_ALT		0x0F
+#define KEYCODE_ESC		0x10
+#define KEYCODE_BS		0x11
+#define KEYCODE_RETURN		0x12
+#define KEYCODE_SPACE		0x14
+#define KEYCODE_DEL		0x15
+#define KEYCODE_CONVERT		0x16	/* japanese kayboard, below R shift */
+#define KEYCODE_UP		0x1C
+#define KEYCODE_LEFT		0x1D
+#define KEYCODE_RIGHT		0x1E
+#define KEYCODE_DOWN		0x1F
+
+#define KEYCODE_ERASE		0x18	/* japanese keyboard, right of BS*/
+#define KEYCODE_PULL		0x19	/* japanese keyboard, left of DEL */
+#define KEYCODE_CHAR_LEFT	0x1A	/* japanese keyboard, below _ERASE */
+#define KEYCODE_CHAR_RIGHT	0x1B	/* japanese keyboard, below _PULL */
+
+#define KEYCODE_F1		0x72
+#define KEYCODE_F2		0x73
+#define KEYCODE_F3		0x74
+#define KEYCODE_F4		0x75
+#define KEYCODE_F5		0x76
+#define KEYCODE_F6		0x77
+#define KEYCODE_F7		0x78
+#define KEYCODE_F8		0x79
+#define KEYCODE_F9		0x7A
+#define KEYCODE_F10		0x7B
+#define KEYCODE_F11		0x20 /* western keyboard only */
+#define KEYCODE_F12		0x21 /* western keyboard only */
+#define KEYCODE_F13		0x30 /* western keyboard only */
+#define KEYCODE_F14		0x31 /* western keyboard only */
+
+/* 123... are 22..2e */
+/* qwe... are 32..3d */
+/* asd... are 42..4d */
+/* zxc... are 52..5c */
+
+/*
+ * The following keyboad codes are generated by the Japanese keypad (KP) only.
+ */
+#define KECODE_KP_PLUS		0x61
+#define KECODE_KP_MINUS		0x62
+#define KECODE_KP_7		0x63
+#define KECODE_KP_8		0x64
+#define KECODE_KP_9		0x65
+#define KECODE_KP_4		0x66
+#define KECODE_KP_5		0x67
+#define KECODE_KP_6		0x68
+#define KECODE_KP_1		0x69
+#define KECODE_KP_2		0x6a
+#define KECODE_KP_3		0x6b
+#define KECODE_KP_0		0x6c
+#define KECODE_KP_PERIOD	0x6d
+#define KECODE_KP_RETURN	0x6e
+#define KECODE_KP_MUL		0x7c
+#define KECODE_KP_DIV		0x7d
+#define KECODE_KP_EQUAL		0x7e
+#define KECODE_KP_COMMA		0x7f

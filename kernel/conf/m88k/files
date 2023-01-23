@@ -1,0 +1,175 @@
+#
+# HISTORY
+# $Log:	files,v $
+# Revision 2.4  93/08/10  15:52:43  mrt
+# 	Added scsi/pc_label.c
+# 	[93/08/05            mrt]
+# 
+# Revision 2.3  93/03/09  10:52:56  danner
+# 	Added rz_audio.c
+# 	[93/03/06            af]
+# 
+# Revision 2.2  93/02/04  16:57:28  mrt
+# 	Removed reference to empty file sys_machdep.c
+# 	[93/01/23            jfriedl]
+# 
+# Revision 2.8  92/08/03  17:30:12  jfriedl
+# 	Cleaned up. Added new files.
+# 	[92/08/03  14:44:01  jfriedl]
+# 
+# Revision 2.7  92/05/21  17:06:04  jfriedl
+# 	Removed references to
+# 		luna88k/mem.c
+# 		luna88k/ufs_machdep.c
+# 		luna88k/vm_machdep.c
+# 	[92/05/18            jfriedl]
+# 
+# Revision 2.6  92/05/04  11:23:44  danner
+# 	Added lance support.
+# 	[92/04/21            danner]
+# 
+# Revision 2.5  92/04/09  10:05:17  rpd
+# 	Removed some nonexistent files, to prevent pseudo-device header
+# 	configuration files from being generated.
+# 	[92/04/09            rpd]
+# 
+# Revision 2.4  92/02/19  13:42:10  elf
+# 	Added motorola directory files.
+# 	[92/01/22  18:42:09  danner]
+# 
+# 	Made cmmu.c luna-independent.
+# 	[92/02/06            danner]
+# 
+# 	Added continuation, exception return.
+# 	[92/02/02            danner]
+# 
+#
+# Revision 2.3  91/08/24  11:55:06  af
+#		Added some missing scsi files.
+#		sd --> scsi
+#
+#	 Revision 2.2  91/07/09  23:14:57  danner
+#	Added scsi/rz_labels.c
+#	[91/07/08  22:55:54  danner]
+#
+#	Initial Checkin
+#	[91/03/08            danner]
+
+
+#
+#
+# Things for any m88k box
+#
+motorola/m88k/endian.c		standard
+motorola/m88k/m88100/cmmu.c	standard
+motorola/m88k/m88100/pcb.c	standard
+motorola/m88k/m88100/continuation.s 	standard
+motorola/m88k/m88100/exception_return.s	standard   
+motorola/m88k/m88100/misc.s	standard
+m88k/pmap.c			standard
+
+#
+#
+chips/busses.c 			optional scsi device-driver
+chips/lance.c			optional ln   device-driver
+chips/lance_mapped.c            optional ln   device-driver
+scsi/adapters/scsi_89352_hdw.c  optional scsi device-driver
+
+#
+#
+luna88k/autoconf.c		standard device-driver
+luna88k/clock.c			standard
+luna88k/conf.c			standard
+
+#
+# MD ddb files
+#
+luna88k/db_disasm.c		optional mach_kdb
+luna88k/db_interface.c		optional mach_kdb
+luna88k/db_sstep.c		optional mach_kdb
+luna88k/db_trace.c		optional mach_kdb
+#luna88k/db_type.c             optional mach_kdb
+
+luna88k/eh.s			standard
+luna88k/locore.s		standard ordered
+luna88k/locore_asm_routines.s	standard
+luna88k/locore_c_routines.c	standard
+luna88k/luna_fp.s		standard
+luna88k/luna_init.c		standard
+luna88k/machine_thread.c        standard
+luna88k/pmap_table.c		standard
+luna88k/setroot.c               standard
+luna88k/softint.c		standard
+luna88k/trap.c			standard
+luna88k/rawprint_asm_routines.s optional raw_printf
+luna88k/rawprint_c_routines.c   optional raw_printf
+luna88k/machdep.c		standard device-driver
+luna88kdev/cons.c		standard device-driver
+luna88kdev/dip.c              standard device-driver
+luna88kdev/fb.c                       optional fb device-driver
+luna88kdev/kbmain.c		standard device-driver
+luna88kdev/lcd.c		standard device-driver
+luna88kdev/msmain.c		standard device-driver
+luna88kdev/pio.c		standard device-driver
+luna88kdev/uart.c		standard device-driver
+
+#luna88k/m88k_exception.c	standard
+#luna88k/pmap.c			standard
+#luna88kdev/asp.c		optional asp device-driver
+#luna88kdev/asp_conf.c		optional asp device-driver
+#luna88kdev/cm.c		optional gp device-driver
+#luna88kdev/console.c		standard device-driver
+#luna88kdev/cosw.c		standard device-driver
+#luna88kdev/cpurom.c		optional cp device-driver
+#luna88kdev/eu.c		optional eu device-driver
+#luna88kdev/ex.c		optional ex device-driver
+#luna88kdev/fbmap.c		optional fb device-driver
+#luna88kdev/gpib.c		optional gp device-driver
+#luna88kdev/gpib.c		optional gp device-driver
+#luna88kdev/nvram.c		standard device-driver
+#luna88kdev/ramdisk.c		optional ra device-driver
+#luna88kdev/rd.c		optional rd device-driver
+#luna88kdev/sc_conf.c		standard device-driver
+#luna88kdev/scsi.c		optional SC device-driver
+#luna88kdev/sd.c		optional sd device-driver
+#luna88kdev/sp.c		optional sp device-driver
+#luna88kdev/st.c		optional st device-driver
+#luna88kdev/tasp.c		optional tasp device-driver
+#luna88kdev/usc.c		optional usc device-driver
+#luna88kdev/xp.c		optional XP device-driver
+#luna88kdev/xp_conf.c		standard device-driver
+#luna88kdev/xpfd.c		optional fd device-driver
+#luna88kdev/xplp.c		optional lp device-driver
+#luna88kdev/xpsio.c		optional sio device-driver
+#luna88kdev/xpssg.c		optional ssg device-driver
+#luna88kif/enet.c		optional enetfilter
+#luna88kif/if_am.c		optional am device-driver
+#luna88kif/if_en.c		optional en device-driver
+#luna88kif/if_pkbuf.c		optional inet device-driver
+#luna88kif/if_qb.c		optional inet device-driver
+#luna88kif/lance.c		optional en device-driver
+#luna88kif/ln_ram.c		optional en device-driver
+#luna88kif/sub.c		optional en device-driver
+
+scsi/adapters/scsi_89352_hdw.c  optional scsi device-driver
+scsi/rz.c                       optional scsi device-driver
+scsi/rz_audio.c                 optional scsi device-driver
+scsi/rz_cpu.c                   optional scsi device-driver
+scsi/rz_disk.c                  optional scsi device-driver
+scsi/rz_disk_bbr.c              optional scsi device-driver
+scsi/rz_labels.c                optional scsi device-driver
+scsi/pc_label.c			optional scsi device-driver
+scsi/rz_tape.c                  optional scsi device-driver
+scsi/scsi.c                     optional scsi device-driver
+scsi/scsi_alldevs.c             optional scsi device-driver
+scsi/scsi_comm.c                optional scsi device-driver
+scsi/scsi_cpu.c                 optional scsi device-driver
+scsi/scsi_disk.c                optional scsi device-driver
+scsi/scsi_jukebox.c             optional scsi device-driver
+scsi/scsi_optical.c             optional scsi device-driver
+scsi/scsi_printer.c             optional scsi device-driver
+scsi/scsi_rom.c                 optional scsi device-driver
+scsi/scsi_scanner.c             optional scsi device-driver
+scsi/scsi_tape.c                optional scsi device-driver
+scsi/scsi_worm.c                optional scsi device-driver
+
